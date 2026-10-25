@@ -1,5 +1,9 @@
 # iOS 16 on sweet (Redmi Note 10 Pro, SM7150) - working notes
 
+> Sibling project `D:/things/Merlin/ios-merlin` (Redmi Note 9 MT6768 port,
+> local-only scaffold created 2026-10-18): merlin facts and handoff live in
+> its own NOTES.md; this file stays sweet-only.
+
 ## Agent handoff / active work (2026-10-15, latest)
 
 ### >>> UPDATE 2026-10-18 (read first, then the 10-17 handoff below) <<<
