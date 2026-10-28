@@ -12,8 +12,9 @@ boot 20/21/27 victims at 0x9f98a000 / 0x9f9ea000 / 0x9fa08000 / 0x9fae0000
 are the SCP span.
 
 1. merlin_excl_start/len default 0x9f800000/0x280000 -> 0x9f900000/
-   0x1e700000, i.e. 0x9f900000-0xbe000000.  This withholds 486 MB and leaves
-   about 730 MB usable (0x80000000-0x9f900000 + 0xbe000000-0xcd000000).
+   0x1e700000, i.e. 0x9f900000-0xbe000000.  This withholds 487 MiB
+   (31,168 16 KiB pages) and leaves about 708 MiB usable (745 MiB managed
+   minus the kernel image below topOfKernelData).
 2. Drop 0095's early jump.  pmap_next_page() jumped first_avail to the end
    of the window on its first call; first_avail is topOfKernelData
    (~0x824e4000), far below the window, so the jump discarded ~476 MB of
@@ -27,7 +28,7 @@ are the SCP span.
 
 --- a/osfmk/arm/pmap/pmap.c
 +++ b/osfmk/arm/pmap/pmap.c
-@@ -2632,15 +2632,22 @@
+@@ -2632,15 +2632,23 @@
  	return pmap_next_page(pnum);
  }
  
@@ -50,8 +51,9 @@ are the SCP span.
 + * md1img.bin at offset 0x76cc0, proving the modem span; boot 27's
 + * 0x9fae0000 victim and the earlier 0x9f98a000 / 0x9f9ea000 / 0x9fa08000
 + * ones are the SCP span.  Keep both spans out of the VM: the default window
-+ * 0x9f900000-0xbe000000 (0x1e700000 bytes, 486 MB) leaves
-+ * 0x80000000-0x9f900000 and 0xbe000000-0xcd000000, about 730 MB.
++ * 0x9f900000-0xbe000000 (0x1e700000 bytes, 487 MiB) leaves
++ * 0x80000000-0x9f900000 and 0xbe000000-0xcd000000, about 708 MiB
++ * usable once the kernel image below topOfKernelData is subtracted.
 + * Boot-arg merlin_excl_pa=START-LEN (hex, e.g. 0x9f900000-0x1e700000)
 + * overrides the default window. */
 +static uint64_t merlin_excl_start = 0x9f900000ull;
@@ -59,7 +61,7 @@ are the SCP span.
  
  /* MERLIN (0094): when FALSE, pmap_next_page() skips the exclusion check so
   * pmap_startup() can iterate physical pages contiguously for the vm_page_array.
-@@ -2686,18 +2693,24 @@
+@@ -2686,18 +2694,24 @@
  		return;
  	}
  	done = true;
@@ -95,7 +97,7 @@ are the SCP span.
  }
  
  
-@@ -2710,27 +2723,17 @@
+@@ -2710,27 +2724,17 @@
  	}
  
  	merlin_excl_init();
