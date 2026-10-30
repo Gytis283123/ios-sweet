@@ -1,28 +1,9 @@
-From: merlin
-Subject: [0107] GPU user client answers backboardd's selector 2
-
-The 0106 boot log (research/logs/sweetlog-0106-20261030.txt) shows the
-whole story: backboardd matched AGXAccelerator, IOServiceOpen type 1
-succeeded (-> 0x0), and it asked exactly ONE selector - sel 2, 0 bytes
-in, 536 bytes out - got kIOReturnUnsupported and never came back.  It
-spent the rest of the hour re-registering IOAcceleratorES notifications
-(279x) while SpringBoard's main thread stayed frozen in the same
-mach_msg2/BoardServices wait as in 0104.
-
-0107 answers that one query with zeroed output and kIOReturnSuccess.
-Everything else stays refused, so the next log shows the next dependency
-one boot at a time.  A zeroed device-info style struct is the least
-committal answer; if backboardd dereferences it badly the sampler and
-panic screen say so.
----
- iokit/Kernel/arm/SweetPlatformExpert.cpp | 17 ++++++++++++++++
- 1 file changed, 17 insertions(+)
-
 diff --git a/iokit/Kernel/arm/SweetPlatformExpert.cpp b/iokit/Kernel/arm/SweetPlatformExpert.cpp
-index 99ca8d7..49d0e37 100644
+index 99ca8d7..af542da 100644
 --- a/iokit/Kernel/arm/SweetPlatformExpert.cpp
 +++ b/iokit/Kernel/arm/SweetPlatformExpert.cpp
-@@ -158,6 +158,23 @@ IOAcceleratorESUserClient::externalMethod(uint32_t selector,
+@@ -155,6 +155,22 @@ IOAcceleratorESUserClient::externalMethod(uint32_t selector,
+     IOExternalMethodArguments *args, IOExternalMethodDispatch *dispatch __unused,
      OSObject *target __unused, void *reference __unused)
  {
 +	/* 0107: the one query backboardd made in the 0106 boot: sel 2,
@@ -36,13 +17,11 @@ index 99ca8d7..49d0e37 100644
 +		memset(args->structureOutput, 0, args->structureOutputSize);
 +		if (sweet_gpu_uc_logged < 200) {
 +			sweet_gpu_uc_logged++;
-+			IOLog("SWEET GPU: uc sel 2 out 536 -> zeroed success (shim)\n");
++			IOLog("SWEET GPU: uc sel 2 out 536 -> zeroed success (shim)
++");
 +		}
 +		return kIOReturnSuccess;
 +	}
  	if (sweet_gpu_uc_logged < 200) {
  		sweet_gpu_uc_logged++;
  		IOLog("SWEET GPU: uc sel %u in %u/%u out %u/%u -> unsupported (shim)\n",
---
-2.30.0
-
