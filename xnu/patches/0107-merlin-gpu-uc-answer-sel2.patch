@@ -1,8 +1,8 @@
 diff --git a/iokit/Kernel/arm/SweetPlatformExpert.cpp b/iokit/Kernel/arm/SweetPlatformExpert.cpp
-index 99ca8d7..af542da 100644
+index 99ca8d7..536de4b 100644
 --- a/iokit/Kernel/arm/SweetPlatformExpert.cpp
 +++ b/iokit/Kernel/arm/SweetPlatformExpert.cpp
-@@ -155,6 +155,22 @@ IOAcceleratorESUserClient::externalMethod(uint32_t selector,
+@@ -155,6 +155,21 @@ IOAcceleratorESUserClient::externalMethod(uint32_t selector,
      IOExternalMethodArguments *args, IOExternalMethodDispatch *dispatch __unused,
      OSObject *target __unused, void *reference __unused)
  {
@@ -17,8 +17,7 @@ index 99ca8d7..af542da 100644
 +		memset(args->structureOutput, 0, args->structureOutputSize);
 +		if (sweet_gpu_uc_logged < 200) {
 +			sweet_gpu_uc_logged++;
-+			IOLog("SWEET GPU: uc sel 2 out 536 -> zeroed success (shim)
-+");
++			IOLog("SWEET GPU: uc sel 2 out 536 -> zeroed success (shim)\n");
 +		}
 +		return kIOReturnSuccess;
 +	}
